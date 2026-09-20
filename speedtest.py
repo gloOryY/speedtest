@@ -1,14 +1,3 @@
-"""speedtest — measure download speed by repeatedly fetching a URL.
-
-Usage:
-    python speedtest.py <URL> [-n COUNT] [--timeout SECONDS] [--json]
-
-The script issues sequential HTTP GET requests to the given URL (typically
-a large static file such as a heavy image), records time-to-first-byte,
-transfer time and payload size for every request, and reports aggregate
-statistics in the console.
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -37,8 +26,6 @@ MB = 1024 * 1024
 
 @dataclass(frozen=True)
 class Sample:
-    """Result of a single successful download."""
-
     size_bytes: int
     ttfb_seconds: float
     total_seconds: float
@@ -52,8 +39,6 @@ class Sample:
 
 @dataclass(frozen=True)
 class Report:
-    """Aggregated statistics over a batch of samples."""
-
     url: str
     samples: list[Sample]
     failures: int
@@ -90,11 +75,6 @@ class Report:
 
 
 def fetch(url: str, timeout: float, chunk_size: int = DEFAULT_CHUNK_SIZE) -> Sample:
-    """Download ``url`` once and return timing information.
-
-    Raises ``urllib.error.URLError`` on network problems and
-    ``urllib.error.HTTPError`` on non-2xx responses.
-    """
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     start = time.perf_counter()
     with urllib.request.urlopen(request, timeout=timeout) as response:
@@ -114,7 +94,6 @@ def iter_samples(
     timeout: float,
     retries: int = DEFAULT_RETRIES,
 ) -> Iterator[Sample]:
-    """Yield up to ``count`` samples, retrying transient failures."""
     failures = 0
     done = 0
     while done < count:
@@ -135,7 +114,6 @@ def iter_samples(
 
 
 def run(url: str, count: int, timeout: float) -> Report:
-    """Run the measurement and return a report."""
     samples: list[Sample] = []
     failures = 0
     for i, sample in enumerate(iter_samples(url, count, timeout), start=1):
@@ -149,7 +127,6 @@ def run(url: str, count: int, timeout: float) -> Report:
 
 
 def format_report(report: Report) -> str:
-    """Render a human-readable report."""
     lines = [
         f"URL                   : {report.url}",
         f"Successful requests   : {len(report.samples)}",

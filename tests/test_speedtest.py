@@ -1,9 +1,3 @@
-"""Tests for speedtest.
-
-Uses a local HTTP server on a random port, so no external network
-access is required.
-"""
-
 import http.server
 import threading
 
